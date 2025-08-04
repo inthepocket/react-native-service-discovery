@@ -116,7 +116,12 @@
       "release": true
     },
     "plugins": {
-      "@release-it/conventional-changelog": {}
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        },
+        "infile": "CHANGELOG.md"
+      }
     }
   },
   "eslintConfig": {
