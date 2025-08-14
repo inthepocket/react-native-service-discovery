@@ -59,7 +59,8 @@ By default, the example is configured to build with the old architecture. To run
 
    ```sh
    cd example/ios
-   RCT_NEW_ARCH_ENABLED=1 pod install
+   bundle install
+   RCT_NEW_ARCH_ENABLED=1 bundle exec pod install
    cd -
    yarn example ios
    ```
