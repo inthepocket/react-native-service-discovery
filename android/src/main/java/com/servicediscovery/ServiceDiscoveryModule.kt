@@ -159,10 +159,10 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
       service.putString("type", "$serviceType.")
       service.putString("domain", "local.")
       service.putInt("port", serviceInfo.port)
+      service.putString("hostName", serviceInfo.hostname)
 
       val host = serviceInfo.host
       if (host != null) {
-        service.putString("hostName", host.canonicalHostName)
         service.putArray("addresses", WritableNativeArray().apply {
           pushString(host.hostAddress)
         })
