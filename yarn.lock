@@ -1826,21 +1826,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@conventional-changelog/git-client@npm:^1.0.0":
-  version: 1.0.1
-  resolution: "@conventional-changelog/git-client@npm:1.0.1"
+"@conventional-changelog/git-client@npm:^2.0.0":
+  version: 2.5.1
+  resolution: "@conventional-changelog/git-client@npm:2.5.1"
   dependencies:
-    "@types/semver": ^7.5.5
+    "@simple-libs/child-process-utils": ^1.0.0
+    "@simple-libs/stream-utils": ^1.1.0
     semver: ^7.5.2
   peerDependencies:
     conventional-commits-filter: ^5.0.0
-    conventional-commits-parser: ^6.0.0
+    conventional-commits-parser: ^6.1.0
   peerDependenciesMeta:
     conventional-commits-filter:
       optional: true
     conventional-commits-parser:
       optional: true
-  checksum: 4be45d4d1335878772fe0ad6e279970569c9526b544af3f58d31d70199f40c8051459a22f02d87c458a7c95f0ba68cd9a839da19504c5c40045c5b0691354305
+  checksum: 9e6ce2c87214832a9cc155d1207109798d71d801b0ab167d89dded621f3231473b5b57b53e266817d4b73afa4cecf981da4cea8d3c51c20a397daca197a73f6d
   languageName: node
   linkType: hard
 
@@ -2453,14 +2454,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-paginate-rest@npm:11.3.1":
-  version: 11.3.1
-  resolution: "@octokit/plugin-paginate-rest@npm:11.3.1"
+"@octokit/openapi-types@npm:^26.0.0":
+  version: 26.0.0
+  resolution: "@octokit/openapi-types@npm:26.0.0"
+  checksum: 4a569f87bd5163b3973a411511ae2410d548555228790baa0d4f70ad77dbe7d5df1cf542d09768b2bbab227eae1f0fa6eaade00d351d2fce1da76deb0e646db5
+  languageName: node
+  linkType: hard
+
+"@octokit/plugin-paginate-rest@npm:^13.0.0":
+  version: 13.2.1
+  resolution: "@octokit/plugin-paginate-rest@npm:13.2.1"
   dependencies:
-    "@octokit/types": ^13.5.0
+    "@octokit/types": ^15.0.1
   peerDependencies:
-    "@octokit/core": 5
-  checksum: 42c7c08e7287b4b85d2ae47852d2ffeb238c134ad6bcff18bddc154b15f6bec31778816c0763181401c370198390db7f6b0c3c44750fdfeec459594f7f4b5933
+    "@octokit/core": ">=6"
+  checksum: c52bccc82ebf4ed9dbcf3e62564dbdbec235c8b8f3600444353147461411844fcc46f8a1665fd3cd1380869a949559d330fd1f70270e2ff47975702cb8389aa4
   languageName: node
   linkType: hard
 
@@ -2525,6 +2533,15 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": ^24.2.0
   checksum: fca3764548d5872535b9025c3b5fe6373fe588b287cb5b5259364796c1931bbe5e9ab8a86a5274ce43bb2b3e43b730067c3b86b6b1ade12a98cd59b2e8b3610d
+  languageName: node
+  linkType: hard
+
+"@octokit/types@npm:^15.0.1":
+  version: 15.0.2
+  resolution: "@octokit/types@npm:15.0.2"
+  dependencies:
+    "@octokit/openapi-types": ^26.0.0
+  checksum: 4a6eede232ce1ecd9679e9bdf54a9f23494e4e5cae4c98c19d12ee02f6b9cd77c69b278d3e832f035aeedf2cd8ff54a53c9eac283d2944108895cb0a80c88937
   languageName: node
   linkType: hard
 
@@ -3031,6 +3048,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@simple-libs/child-process-utils@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@simple-libs/child-process-utils@npm:1.0.1"
+  dependencies:
+    "@simple-libs/stream-utils": ^1.1.0
+    "@types/node": ^22.0.0
+  checksum: 5a8aa820fa635a116027b782fe601ec673a98f302e991e4b84097e007d7d65106caad96d5674d38a673c8fb63e0a737345498e982db5d53562b6cae5a680ee6c
+  languageName: node
+  linkType: hard
+
+"@simple-libs/stream-utils@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@simple-libs/stream-utils@npm:1.1.0"
+  dependencies:
+    "@types/node": ^22.0.0
+  checksum: 13cb27400fa96c3d212d273ebc501851eaf4b13067be9961cfcc51e19e715e698c12cebd974ffa3135e94c7fd59c5bc857135cc64c1f61f3dd5f38e1a80d88a1
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -3205,6 +3241,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^22.0.0":
+  version: 22.19.1
+  resolution: "@types/node@npm:22.19.1"
+  dependencies:
+    undici-types: ~6.21.0
+  checksum: 62b72e26a51659e654cfd6791f296a95ebc4b1deb1fa97f7a5cea4032434d1b4f14021f6e52eb9ea0cc1d1a7ab90567797a25c3865e3ea3d2caf6b3ea0ac4c4d
+  languageName: node
+  linkType: hard
+
 "@types/normalize-package-data@npm:^2.4.0, @types/normalize-package-data@npm:^2.4.3":
   version: 2.4.4
   resolution: "@types/normalize-package-data@npm:2.4.4"
@@ -3236,7 +3281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.3.12, @types/semver@npm:^7.5.5":
+"@types/semver@npm:^7.3.12":
   version: 7.7.1
   resolution: "@types/semver@npm:7.7.1"
   checksum: 76d218e414482a398148d5c28f2bfa017108869f3fc18cda379c9d8d062348f8b9653ae2fa8642d3b5b52e211928fe8be34f22da4e1f08245c84e0e51e040673
@@ -12117,6 +12162,13 @@ __metadata:
   version: 5.26.5
   resolution: "undici-types@npm:5.26.5"
   checksum: 3192ef6f3fd5df652f2dc1cd782b49d6ff14dc98e5dced492aa8a8c65425227da5da6aafe22523c67f035a272c599bb89cfe803c1db6311e44bed3042fc25487
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 46331c7d6016bf85b3e8f20c159d62f5ae471aba1eb3dc52fff35a0259d58dcc7d592d4cc4f00c5f9243fa738a11cfa48bd20203040d4a9e6bc25e807fab7ab3
   languageName: node
   linkType: hard
 

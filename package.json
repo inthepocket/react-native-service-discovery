@@ -83,7 +83,9 @@
   },
   "resolutions": {
     "@types/react": "^18.2.44",
-    "tmp": "^0.2.4"
+    "tmp": "^0.2.4",
+    "@conventional-changelog/git-client": "^2.0.0",
+    "@octokit/plugin-paginate-rest": "^13.0.0"
   },
   "peerDependencies": {
     "react": "*",
