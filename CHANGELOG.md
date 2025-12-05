@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>0.2.4 (2025-12-05)</small>
+
+* chore: perform audit fixes through yarn resolutions ([d52cb4c](https://github.com/inthepocket/react-native-service-discovery/commit/d52cb4c))
+
 ## <small>0.2.3 (2025-12-05)</small>
 
 * chore: run audit fix ([9c63769](https://github.com/inthepocket/react-native-service-discovery/commit/9c63769))
