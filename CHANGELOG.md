@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>0.2.3 (2025-12-05)</small>
+
+* chore: run audit fix ([9c63769](https://github.com/inthepocket/react-native-service-discovery/commit/9c63769))
+
 ## <small>0.2.2 (2025-09-10)</small>
 
 * security: fix CVE-2025-54798 by updating tmp package to ^0.2.4 ([b6cfe93](https://github.com/inthepocket/react-native-service-discovery/commit/b6cfe93))
