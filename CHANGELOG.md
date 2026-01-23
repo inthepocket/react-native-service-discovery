@@ -1,5 +1,12 @@
 # Changelog
 
+## <small>0.2.5 (2026-01-23)</small>
+
+* fix(android): add resolve queue to handle NsdManager single-resolve limitation ([9af304d](https://github.com/inthepocket/react-native-service-discovery/commit/9af304d))
+* fix(ci): resolve iOS build failures from stale codegen cache ([645b9e5](https://github.com/inthepocket/react-native-service-discovery/commit/645b9e5))
+* feat: use bundler in ios setup ([47e19e7](https://github.com/inthepocket/react-native-service-discovery/commit/47e19e7))
+* feat(deps): run the example build on macos-15 and update ruby to 3.3 ([608557d](https://github.com/inthepocket/react-native-service-discovery/commit/608557d))
+
 ## <small>0.2.4 (2025-12-05)</small>
 
 * chore: perform audit fixes through yarn resolutions ([d52cb4c](https://github.com/inthepocket/react-native-service-discovery/commit/d52cb4c))
