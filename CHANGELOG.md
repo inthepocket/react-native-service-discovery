@@ -1,6 +1,6 @@
 # Changelog
 
-# [](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.5...vnull) (2026-04-14)
+## [0.2.6](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.5...v0.2.6) (2026-04-14)
 
 
 ### Bug Fixes
