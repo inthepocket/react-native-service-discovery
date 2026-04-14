@@ -1,5 +1,13 @@
 # Changelog
 
+# [](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.5...vnull) (2026-04-14)
+
+
+### Bug Fixes
+
+* **deps:** patch critical vulnerabilities in handlebars and basic-ftp ([f8bbc05](https://github.com/inthepocket/react-native-service-discovery/commit/f8bbc05c1da27cc2e8fd1e3eb199bc0b2e3f0f9c))
+* **deps:** upgrade commitlint to v20 to resolve version conflict ([4fcfec4](https://github.com/inthepocket/react-native-service-discovery/commit/4fcfec459d1c1c631c6649d393d11d079005e849))
+
 ## <small>0.2.5 (2026-01-23)</small>
 
 * fix(android): add resolve queue to handle NsdManager single-resolve limitation ([9af304d](https://github.com/inthepocket/react-native-service-discovery/commit/9af304d))
