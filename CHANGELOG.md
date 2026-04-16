@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.8](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.6...v0.2.8) (2026-04-16)
+
+
+### Bug Fixes
+
+* **deps:** patch high-severity vulnerabilities across npm and Ruby dependencies ([4968c04](https://github.com/inthepocket/react-native-service-discovery/commit/4968c045a10c71e5ab36f70443076b859aad4d10)), closes [hi#severity](https://github.com/hi/issues/severity)
+* **docs:** correct malformed v0.2.6 changelog header ([3da9e8e](https://github.com/inthepocket/react-native-service-discovery/commit/3da9e8e55b945ff983f54f6e32d49598deb07d94))
+
 ## [0.2.6](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.5...v0.2.6) (2026-04-14)
 
 
