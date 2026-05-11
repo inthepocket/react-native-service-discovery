@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.9](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.8...v0.2.9) (2026-05-11)
+
+
+### Bug Fixes
+
+* **ci:** bump Node.js version to 22 for builder-bob v0.41 compatibility ([023af74](https://github.com/inthepocket/react-native-service-discovery/commit/023af74aafd784ac758c3841f1a4d04e48d1ae52))
+* **deps:** patch high-severity vulnerabilities ([19ae2d5](https://github.com/inthepocket/react-native-service-discovery/commit/19ae2d590037a037d0eaa98d0d0626278482f6c3)), closes [hi#severity](https://github.com/hi/issues/severity)
+
 ## [0.2.8](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.6...v0.2.8) (2026-04-16)
 
 
