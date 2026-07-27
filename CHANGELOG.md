@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.10](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.9...v0.2.10) (2026-07-27)
+
+
+### Bug Fixes
+
+* **deps:** patch high-severity vulnerabilities ([11372c2](https://github.com/inthepocket/react-native-service-discovery/commit/11372c2a76dd3825498d6d9889172e0f1274be71)), closes [hi#severity](https://github.com/hi/issues/severity)
+
 ## [0.2.9](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.8...v0.2.9) (2026-05-11)
 
 
