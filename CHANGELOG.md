@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.11](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.10...v0.2.11) (2026-07-27)
+
+
+### Bug Fixes
+
+* **deps:** cap babel plugin-transform-modules-systemjs resolution below 8.0.0 ([d72293f](https://github.com/inthepocket/react-native-service-discovery/commit/d72293fa030e75c360fa06fe3921ea41bb357b2e))
+* **deps:** patch newly-surfaced high-severity vulnerabilities ([51c8f71](https://github.com/inthepocket/react-native-service-discovery/commit/51c8f710121bc3ed748fbbaa6c3ac7d910909652)), closes [hi#severity](https://github.com/hi/issues/severity)
+
 ## [0.2.10](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.9...v0.2.10) (2026-07-27)
 
 
