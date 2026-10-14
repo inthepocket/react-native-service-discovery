@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.13](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.12...v0.2.13) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** patch high and critical vulnerabilities ([#10](https://github.com/inthepocket/react-native-service-discovery/issues/10)) ([3c4cdd3](https://github.com/inthepocket/react-native-service-discovery/commit/3c4cdd35d258b593d9c60db32c24e4158889dcbf))
+
 ## [0.2.12](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.11...v0.2.12) (2026-09-15)
 
 
