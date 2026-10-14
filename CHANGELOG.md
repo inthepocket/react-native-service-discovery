@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.14](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.13...v0.2.14) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** patch newly-surfaced high and critical vulnerabilities ([#11](https://github.com/inthepocket/react-native-service-discovery/issues/11)) ([1048de8](https://github.com/inthepocket/react-native-service-discovery/commit/1048de88177fa741b40335905581b6c843db6502))
+* **example:** raise gradle heap to 4096m ([#12](https://github.com/inthepocket/react-native-service-discovery/issues/12)) ([7868b0c](https://github.com/inthepocket/react-native-service-discovery/commit/7868b0c2a79e02600e8cb1c589a452bed26ddd17))
+* **example:** raise gradle heap to 4096m ([#13](https://github.com/inthepocket/react-native-service-discovery/issues/13)) ([b025eff](https://github.com/inthepocket/react-native-service-discovery/commit/b025efffb5a7c61601e001bf8a04ec71a820328c))
+
 ## [0.2.13](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.12...v0.2.13) (2026-10-14)
 
 
