@@ -3,6 +3,7 @@ package com.servicediscovery
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -243,6 +244,22 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
     return String.format("_%s._tcp.", type)
   }
 
+  // NsdServiceInfo.getHostname() exists from API 36 and is called by reflection so that the module
+  // compiles against older SDKs. canonicalHostName returns the IP when reverse DNS fails.
+  private fun getHostName(serviceInfo: NsdServiceInfo): String? {
+    if (Build.VERSION.SDK_INT >= 36) {
+      try {
+        val hostname = NsdServiceInfo::class.java.getMethod("getHostname").invoke(serviceInfo) as? String
+        if (!hostname.isNullOrEmpty()) {
+          return hostname
+        }
+      } catch (e: ReflectiveOperationException) {
+        Log.w(NAME, "Could not read the service hostname", e)
+      }
+    }
+    return serviceInfo.host?.canonicalHostName
+  }
+
   private fun serviceToMap(serviceInfo: NsdServiceInfo): WritableMap {
     val service: WritableMap = WritableNativeMap()
     try {
@@ -253,13 +270,12 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
       service.putInt("port", serviceInfo.port)
 
       val host = serviceInfo.host
+      service.putString("hostName", getHostName(serviceInfo))
       if (host != null) {
-        service.putString("hostName", host.canonicalHostName)
         service.putArray("addresses", WritableNativeArray().apply {
           pushString(host.hostAddress)
         })
       } else {
-        service.putString("hostName", null)
         service.putArray("addresses", WritableNativeArray())
       }
       val txt: WritableMap = WritableNativeMap()
