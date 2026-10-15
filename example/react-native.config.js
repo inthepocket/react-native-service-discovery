@@ -7,7 +7,7 @@ module.exports = {
       root: path.join(__dirname, '..'),
     },
     'react-native-example-broadcaster': {
-      root: path.join(__dirname, 'broadcaster'),
+      root: path.join(__dirname, 'modules', 'broadcaster'),
     },
   },
 };
