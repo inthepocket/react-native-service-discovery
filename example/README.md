@@ -81,7 +81,7 @@ To learn more about React Native, take a look at the following resources:
 ## Testing discovery
 
 The app can search for and broadcast services.
-The Broadcast section publishes `ITP-<platform>-<type>` services of type `http`, `ssh` and `itptest` through the example-only `broadcaster` module.
+The Broadcast section publishes `ITP-<platform>-<type>` services of type `http`, `ssh` and `itptest` through the example-only native module in `example/modules/broadcaster`.
 
 Install the app on two devices on the same Wi-Fi.
 Broadcast on one device and search on the other.
