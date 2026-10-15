@@ -1,5 +1,24 @@
 # Changelog
 
+# [0.3.0](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.14...v0.3.0) (2026-10-15)
+
+
+### Bug Fixes
+
+* **android:** make service state thread-safe and release it on destroy ([#25](https://github.com/inthepocket/react-native-service-discovery/issues/25)) ([a832ae8](https://github.com/inthepocket/react-native-service-discovery/commit/a832ae89629a03c59c130d6159f805480725702d))
+* **android:** reject startSearch when discovery fails to start ([#26](https://github.com/inthepocket/react-native-service-discovery/issues/26)) ([fc90e83](https://github.com/inthepocket/react-native-service-discovery/commit/fc90e830f096c64fe42c187c23ac012abd961e1a))
+* **android:** report the service hostname instead of the IP ([#24](https://github.com/inthepocket/react-native-service-discovery/issues/24)) ([9d44f08](https://github.com/inthepocket/react-native-service-discovery/commit/9d44f088df10833296816096ab818edff4d36b7c))
+* **android:** scope services and stopSearch to their service type ([#19](https://github.com/inthepocket/react-native-service-discovery/issues/19)) ([61c02ea](https://github.com/inthepocket/react-native-service-discovery/commit/61c02ea0781130fcb34de58ec5382e220a1946ee))
+* **ios:** clear service delegates on stop and dealloc ([#17](https://github.com/inthepocket/react-native-service-discovery/issues/17)) ([4debf48](https://github.com/inthepocket/react-native-service-discovery/commit/4debf4823fde3037eef9db57c0797615ee26176d))
+* **ios:** ignore startSearch for a type that is already being searched ([#14](https://github.com/inthepocket/react-native-service-discovery/issues/14)) ([3d38c16](https://github.com/inthepocket/react-native-service-discovery/commit/3d38c16019b622bc92d52cb531c106e5b50537c8))
+* **ios:** reject startSearch when the browser fails to start ([#15](https://github.com/inthepocket/react-native-service-discovery/issues/15)) ([1bea420](https://github.com/inthepocket/react-native-service-discovery/commit/1bea42073c63321df5cafdbeba84507201ae5fe6))
+* **ios:** stop resolving once a service is resolved or fails to resolve ([#16](https://github.com/inthepocket/react-native-service-discovery/issues/16)) ([a3a371a](https://github.com/inthepocket/react-native-service-discovery/commit/a3a371a7a625d268327bcdb0862156b5ef6e5854))
+
+
+### Features
+
+* **example:** broadcast mDNS services from the example app ([#23](https://github.com/inthepocket/react-native-service-discovery/issues/23)) ([480cfaf](https://github.com/inthepocket/react-native-service-discovery/commit/480cfaf6b44ae42cf2d22b0ee2ac9dd00a4fb38d))
+
 ## [0.2.14](https://github.com/inthepocket/react-native-service-discovery/compare/v0.2.13...v0.2.14) (2026-10-14)
 
 

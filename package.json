@@ -1,6 +1,6 @@
 {
   "name": "@inthepocket/react-native-service-discovery",
-  "version": "0.2.14",
+  "version": "0.3.0",
   "description": "mDNS Network Service Discovery in React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
