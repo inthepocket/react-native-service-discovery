@@ -19,6 +19,7 @@ import java.util.LinkedList
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 
 
 class ServiceDiscoveryModule internal constructor(context: ReactApplicationContext) :
@@ -62,12 +63,16 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
   // Converting a service can block on a reverse DNS lookup for the host name,
   // so it runs on a single worker that also keeps events in order.
   private fun sendServiceEvent(eventName: String, serviceInfo: NsdServiceInfo) {
-    eventExecutor.execute {
-      try {
-        sendEvent(eventName, serviceToMap(serviceInfo))
-      } catch (e: Exception) {
-        Log.e(NAME, "Error sending $eventName", e)
+    try {
+      eventExecutor.execute {
+        try {
+          sendEvent(eventName, serviceToMap(serviceInfo))
+        } catch (e: Exception) {
+          Log.e(NAME, "Error sending $eventName", e)
+        }
       }
+    } catch (e: RejectedExecutionException) {
+      // Module was invalidated
     }
   }
 
@@ -77,6 +82,19 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
 
   @ReactMethod
   override fun removeListeners(count: Double) {
+  }
+
+  override fun invalidate() {
+    super.invalidate()
+    discoveryListeners.values.forEach { tryStopServiceDiscovery(it) }
+    discoveryListeners.clear()
+    resolvedServices.clear()
+    synchronized(resolveQueue) {
+      resolveQueue.clear()
+      pendingServices.clear()
+    }
+    mainHandler.removeCallbacksAndMessages(null)
+    eventExecutor.shutdownNow()
   }
 
   private fun queueServiceForResolve(service: NsdServiceInfo) {
