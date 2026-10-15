@@ -64,17 +64,19 @@ RCT_EXPORT_METHOD(startSearch:(NSString *)type
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
-    NSNetServiceBrowser *browser = self.browsers[type];
-
-    if (!browser) {
-        // Create a new NSNetServiceBrowser instance if not exists
-        browser = [[NSNetServiceBrowser alloc] init];
-        browser.delegate = self;
-
-        // Store the browser and associated services in dictionaries
-        self.browsers[type] = browser;
-        self.servicesByType[type] = [NSMutableDictionary dictionary];
+    if (self.browsers[type]) {
+        // Already searching for this type
+        resolve(nil);
+        return;
     }
+
+    // Create a new NSNetServiceBrowser instance
+    NSNetServiceBrowser *browser = [[NSNetServiceBrowser alloc] init];
+    browser.delegate = self;
+
+    // Store the browser and associated services in dictionaries
+    self.browsers[type] = browser;
+    self.servicesByType[type] = [NSMutableDictionary dictionary];
 
     // Start searching for services based on type
     NSString *serviceType = [NSString stringWithFormat:@"_%@._tcp.", type];
