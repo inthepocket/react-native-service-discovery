@@ -39,6 +39,12 @@ RCT_EXPORT_MODULE()
         [browser stop];
         browser.delegate = nil;
     }
+    for (NSDictionary *services in self.servicesByType.allValues) {
+        for (NSNetService *service in services.allValues) {
+            [service stop];
+            service.delegate = nil;
+        }
+    }
 }
 
 - (NSArray<NSString *> *)supportedEvents
@@ -103,7 +109,10 @@ RCT_EXPORT_METHOD(stopSearch:(NSString *)type
 
         for (NSNetService *service in services.allValues) {
             [service stop];
+            service.delegate = nil;
         }
+
+        browser.delegate = nil;
 
         // Remove the browser and associated services from dictionaries
         [services removeAllObjects];
