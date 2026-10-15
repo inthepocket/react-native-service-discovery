@@ -16,18 +16,20 @@ import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.nio.charset.StandardCharsets
 import java.util.LinkedList
+import java.util.concurrent.ConcurrentHashMap
 
 
 class ServiceDiscoveryModule internal constructor(context: ReactApplicationContext) :
   ServiceDiscoverySpec(context) {
 
-  private val discoveryListeners: MutableMap<String, NsdManager.DiscoveryListener> = HashMap()
+  // NsdManager callbacks run on its own thread, React methods on the native modules thread.
+  private val discoveryListeners: MutableMap<String, NsdManager.DiscoveryListener> = ConcurrentHashMap()
   private val nsdManager: NsdManager =
     reactApplicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
 
   // Keep track of resolved services, because onServiceLost doesn't pass a resolved service.
   // Keyed by serviceKey() so identical names of different types don't collide.
-  private val resolvedServices: MutableMap<String, NsdServiceInfo> = HashMap()
+  private val resolvedServices: MutableMap<String, NsdServiceInfo> = ConcurrentHashMap()
 
   // Resolve queue to handle Android's single-resolve limitation
   private data class ResolveRequest(val service: NsdServiceInfo, var retryCount: Int = 0)
