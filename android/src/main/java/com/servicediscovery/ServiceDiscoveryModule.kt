@@ -25,7 +25,8 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
   private val nsdManager: NsdManager =
     reactApplicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
 
-  // Keep track of resolved services, because onServiceLost doesn't pass a resolved service
+  // Keep track of resolved services, because onServiceLost doesn't pass a resolved service.
+  // Keyed by serviceKey() so identical names of different types don't collide.
   private val resolvedServices: MutableMap<String, NsdServiceInfo> = HashMap()
 
   // Resolve queue to handle Android's single-resolve limitation
@@ -62,10 +63,10 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
   }
 
   private fun queueServiceForResolve(service: NsdServiceInfo) {
-    val serviceKey = "${service.serviceName}-${service.serviceType}"
+    val serviceKey = serviceKey(service)
     synchronized(resolveQueue) {
       // Skip if already pending or resolved
-      if (pendingServices.contains(serviceKey) || resolvedServices.containsKey(service.serviceName)) {
+      if (pendingServices.contains(serviceKey) || resolvedServices.containsKey(serviceKey)) {
         return
       }
       pendingServices.add(serviceKey)
@@ -94,13 +95,15 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
       nsdManager.resolveService(request.service, object : NsdManager.ResolveListener {
         override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
           try {
-            val serviceKey = "${serviceInfo.serviceName}-${serviceInfo.serviceType}"
+            val serviceKey = serviceKey(serviceInfo)
             synchronized(resolveQueue) {
               pendingServices.remove(serviceKey)
             }
-            resolvedServices[serviceInfo.serviceName] = serviceInfo
-            sendEvent(SERVICE_FOUND, serviceToMap(serviceInfo))
-            Log.d(NAME, "Resolved service: ${serviceInfo.serviceName}")
+            if (discoveryListeners.containsKey(normalizeType(serviceInfo.serviceType))) {
+              resolvedServices[serviceKey] = serviceInfo
+              sendEvent(SERVICE_FOUND, serviceToMap(serviceInfo))
+              Log.d(NAME, "Resolved service: ${serviceInfo.serviceName}")
+            }
           } catch (e: Exception) {
             Log.e(NAME, "Error handling resolved service", e)
           } finally {
@@ -113,10 +116,14 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
           Log.e(NAME, "Resolve failed for ${serviceInfo.serviceName}: errorCode=$errorCode")
 
-          val serviceKey = "${serviceInfo.serviceName}-${serviceInfo.serviceType}"
+          val serviceKey = serviceKey(serviceInfo)
 
           // Retry on FAILURE_ALREADY_ACTIVE (3) or other transient errors
-          if (request.retryCount < MAX_RETRY_COUNT) {
+          if (!discoveryListeners.containsKey(normalizeType(serviceInfo.serviceType))) {
+            synchronized(resolveQueue) {
+              pendingServices.remove(serviceKey)
+            }
+          } else if (request.retryCount < MAX_RETRY_COUNT) {
             request.retryCount++
             synchronized(resolveQueue) {
               resolveQueue.add(request) // Re-queue for retry
@@ -164,7 +171,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
           override fun onServiceFound(service: NsdServiceInfo) {
             try {
               // Service discovery success
-              if (service.serviceType == serviceType) {
+              if (isOfType(service, serviceType)) {
                 // Queue the service for resolution instead of resolving immediately
                 queueServiceForResolve(service)
               }
@@ -176,7 +183,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
           override fun onServiceLost(serviceInfo: NsdServiceInfo) {
             try {
               // Service lost
-              val service = resolvedServices.remove(serviceInfo.serviceName)
+              val service = resolvedServices.remove(serviceKey(serviceInfo))
               if (service != null) {
                 sendEvent(SERVICE_LOST, serviceToMap(service))
               } else {
@@ -212,14 +219,13 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
   @ReactMethod
   override fun stopSearch(type: String, promise: Promise) {
     try {
-      resolvedServices.clear()
+      val serviceType = getServiceType(type)
+      resolvedServices.values.removeAll { isOfType(it, serviceType) }
       synchronized(resolveQueue) {
-        resolveQueue.clear()
-        pendingServices.clear()
-        isResolving = false
+        resolveQueue.removeAll { isOfType(it.service, serviceType) }
+        pendingServices.removeAll { it.endsWith("-$serviceType") }
       }
 
-      val serviceType = getServiceType(type)
       val discoveryListener = discoveryListeners.remove(serviceType)
       if (discoveryListener != null) {
         tryStopServiceDiscovery(discoveryListener)
@@ -238,6 +244,22 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
     } catch (e: Exception) {
       Log.e(NAME, "Error stopping search", e)
     }
+  }
+
+  // Keyed on the normalized type, see normalizeType.
+  private fun serviceKey(service: NsdServiceInfo): String {
+    return "${service.serviceName}-${normalizeType(service.serviceType)}"
+  }
+
+  // AOSP NsdService delivers the type in two forms on every Android version:
+  // found and lost as `_http._tcp.`, resolved as `._http._tcp`.
+  // Always compare and key on this canonical form `_http._tcp.`.
+  private fun normalizeType(type: String): String {
+    return type.removePrefix(".").removeSuffix(".") + "."
+  }
+
+  private fun isOfType(service: NsdServiceInfo, serviceType: String): Boolean {
+    return normalizeType(service.serviceType) == serviceType
   }
 
   private fun getServiceType(type: String): String {
@@ -264,8 +286,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
     val service: WritableMap = WritableNativeMap()
     try {
       service.putString("name", serviceInfo.serviceName)
-      val serviceType = serviceInfo.serviceType.removePrefix(".");
-      service.putString("type", "$serviceType.")
+      service.putString("type", normalizeType(serviceInfo.serviceType))
       service.putString("domain", "local.")
       service.putInt("port", serviceInfo.port)
 
