@@ -197,6 +197,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
         object : NsdManager.DiscoveryListener {
           override fun onDiscoveryStarted(regType: String) {
             Log.d(NAME, "Discovery started for $regType")
+            promise.resolve(null)
           }
 
           override fun onDiscoveryStopped(regType: String) {
@@ -232,21 +233,20 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
 
           override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
             Log.e(NAME, "Discovery start failed: $errorCode")
-            tryStopServiceDiscovery(this)
+            discoveryListeners.remove(serviceType)
+            promise.reject("E_START_FAILED", "Failed to start searching for $serviceType (error code $errorCode)")
           }
 
           override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
             Log.e(NAME, "Discovery stop failed: $errorCode")
-            tryStopServiceDiscovery(this)
           }
         }
       discoveryListeners[serviceType] = discoveryListener
 
       nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
-      promise.resolve(null)
-      return
     } catch (e: Exception) {
       Log.e(NAME, "Error starting search", e)
+      discoveryListeners.remove(getServiceType(type))
       promise.reject(e)
     }
   }
