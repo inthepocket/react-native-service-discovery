@@ -5,6 +5,8 @@
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSNetServiceBrowser *> *browsers;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableDictionary *> *servicesByType;
+// Promise blocks of startSearch calls that are waiting for the browser to start, as @[resolve, reject]
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSArray *> *pendingStarts;
 @property (nonatomic, assign) BOOL hasListeners;
 
 @end
@@ -26,6 +28,7 @@ RCT_EXPORT_MODULE()
         // Initialize dictionaries to store browsers and services
         _browsers = [NSMutableDictionary dictionary];
         _servicesByType = [NSMutableDictionary dictionary];
+        _pendingStarts = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -77,11 +80,12 @@ RCT_EXPORT_METHOD(startSearch:(NSString *)type
     // Store the browser and associated services in dictionaries
     self.browsers[type] = browser;
     self.servicesByType[type] = [NSMutableDictionary dictionary];
+    // Settled in netServiceBrowserWillSearch: or netServiceBrowser:didNotSearch:
+    self.pendingStarts[type] = @[[resolve copy], [reject copy]];
 
     // Start searching for services based on type
     NSString *serviceType = [NSString stringWithFormat:@"_%@._tcp.", type];
     [browser searchForServicesOfType:serviceType inDomain:@""]; // Intentionally left blank (instead of limiting to "local.")
-    resolve(nil);
 }
 
 RCT_EXPORT_METHOD(stopSearch:(NSString *)type
@@ -89,6 +93,7 @@ RCT_EXPORT_METHOD(stopSearch:(NSString *)type
                   reject:(RCTPromiseRejectBlock)reject)
 {
     NSNetServiceBrowser *browser = self.browsers[type];
+    [self settlePendingStartForType:type error:nil];
 
     if (browser) {
         // Stop the browser and associated services when requested
@@ -119,6 +124,27 @@ RCT_EXPORT_METHOD(stopSearch:(NSString *)type
 }
 
 #pragma mark - NSNetServiceBrowserDelegate
+
+- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)browser
+{
+    [self settlePendingStartForType:[self searchTypeForBrowser:browser] error:nil];
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *, NSNumber *> *)errorDict
+{
+    NSString *type = [self searchTypeForBrowser:browser];
+    if (!type) {
+        return;
+    }
+
+    browser.delegate = nil;
+    [self.browsers removeObjectForKey:type];
+    [self.servicesByType removeObjectForKey:type];
+
+    NSInteger code = [errorDict[NSNetServicesErrorCode] integerValue];
+    NSString *message = [NSString stringWithFormat:@"Failed to start searching for %@ (error code %ld)", type, (long)code];
+    [self settlePendingStartForType:type error:[NSError errorWithDomain:NSNetServicesErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey: message}]];
+}
 
 // Called when a service is found during the search
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindService:(NSNetService *)service moreComing:(BOOL)moreComing
@@ -188,6 +214,30 @@ RCT_EXPORT_METHOD(stopSearch:(NSString *)type
 }
 
 #pragma mark - Helpers
+
+// Reverse lookup in self.browsers, nil when the browser is no longer tracked
+- (NSString *)searchTypeForBrowser:(NSNetServiceBrowser *)browser
+{
+    return [[self.browsers allKeysForObject:browser] firstObject];
+}
+
+// Resolves the pending startSearch promise of a type, or rejects it when an error is given
+- (void)settlePendingStartForType:(NSString *)type error:(NSError *)error
+{
+    NSArray *blocks = type ? self.pendingStarts[type] : nil;
+    if (!blocks) {
+        return;
+    }
+
+    [self.pendingStarts removeObjectForKey:type];
+    if (error) {
+        RCTPromiseRejectBlock reject = blocks[1];
+        reject(@"E_START_FAILED", error.localizedDescription, error);
+    } else {
+        RCTPromiseResolveBlock resolve = blocks[0];
+        resolve(nil);
+    }
+}
 
 - (NSString *)typeWithoutUnderscoreAndProtocol:(NSString *)fullType
 {
