@@ -1,9 +1,10 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   Platform,
   StyleSheet,
+  SafeAreaView,
   View,
   Text,
   ScrollView,
@@ -15,10 +16,11 @@ import {
   stopSearch,
 } from '@inthepocket/react-native-service-discovery';
 import { Broadcaster } from './broadcaster';
-import { ListItem } from './ListItem';
+import { ToggleChip } from './ToggleChip';
 
 export default function App() {
   const [log, setLog] = useState('');
+  const logRef = useRef<ScrollView>(null);
   const [services, setServices] = useState([
     { name: 'ssh', enabled: false },
     { name: 'http', enabled: false },
@@ -91,48 +93,49 @@ export default function App() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentInsetAdjustmentBehavior="always"
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
-    >
-      <Text style={styles.title}>Services</Text>
-      <Text style={styles.subtitle}>
-        Listen for services of a type on the network.
-      </Text>
-      <View style={styles.section}>
-        {services.map(({ name, enabled }) => (
-          <ListItem
-            key={name}
-            service={name}
-            onChange={(value) => toggleService(name, value)}
-            enabled={enabled}
-          />
-        ))}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.controls}>
+        <Text style={styles.title}>Services</Text>
+        <Text style={styles.subtitle}>
+          Listen for services of a type on the network.
+        </Text>
+        <View style={styles.chips}>
+          {services.map(({ name, enabled }) => (
+            <ToggleChip
+              key={name}
+              label={name}
+              onChange={(value) => toggleService(name, value)}
+              enabled={enabled}
+            />
+          ))}
+        </View>
+        <Text style={styles.title}>Broadcast</Text>
+        <Text style={styles.subtitle}>
+          Publish a service of this app for other devices to find.
+        </Text>
+        <View style={styles.chips}>
+          {broadcasts.map(({ name, enabled }) => (
+            <ToggleChip
+              key={name}
+              label={name}
+              onChange={(value) => toggleBroadcast(name, value)}
+              enabled={enabled}
+            />
+          ))}
+        </View>
+        <View style={styles.logsHeader}>
+          <Text style={styles.title}>Logs</Text>
+          <Button title="Clear logs" onPress={() => setLog('')} />
+        </View>
       </View>
-      <Text style={styles.title}>Broadcast</Text>
-      <Text style={styles.subtitle}>
-        Publish a service of this app for other devices to find.
-      </Text>
-      <View style={styles.section}>
-        {broadcasts.map(({ name, enabled }) => (
-          <ListItem
-            key={name}
-            service={name}
-            onChange={(value) => toggleBroadcast(name, value)}
-            enabled={enabled}
-          />
-        ))}
-      </View>
-      <Text style={styles.title}>Logs</Text>
-      <View style={styles.button}>
-        <Button title="Clear logs" onPress={() => setLog('')} />
-      </View>
-      <ScrollView horizontal style={styles.logs}>
-        <Text>{log}</Text>
+      <ScrollView
+        ref={logRef}
+        style={styles.logs}
+        onContentSizeChange={() => logRef.current?.scrollToEnd()}
+      >
+        <Text style={styles.logText}>{log}</Text>
       </ScrollView>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -141,31 +144,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2F2F7',
   },
-  contentContainer: {
-    flexGrow: 1,
+  controls: {
+    paddingHorizontal: 16,
   },
   title: {
-    marginHorizontal: 28,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   subtitle: {
-    marginHorizontal: 28,
-    marginTop: 4,
+    marginTop: 2,
     fontSize: 13,
     color: '#6C6C70',
   },
-  section: {
-    margin: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    borderCurve: 'continuous',
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+    marginBottom: 16,
   },
-  button: {
-    margin: 16,
+  logsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   logs: {
     flex: 1,
+    padding: 8,
     backgroundColor: '#FFF',
+  },
+  logText: {
+    fontSize: 11,
+    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
   },
 });
