@@ -1,87 +1,27 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Example app
 
-# Getting Started
+Example app for `@inthepocket/react-native-service-discovery`.
+It searches for mDNS services, lists the events in a log and broadcasts test services.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Run
 
-## Step 1: Start the Metro Server
+Run from the repository root.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+```sh
+yarn install
+cd example/ios && bundle install && bundle exec pod install && cd ../..
+yarn example start
+yarn example ios
+yarn example android
 ```
 
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Start Metro first, then run the platform you need in a second terminal.
 
 ## Testing discovery
 
-The app can search for and broadcast services.
-The Broadcast section publishes `ITP-<platform>-<type>` services of type `http`, `ssh` and `itptest` through the example-only native module in `example/modules/broadcaster`.
+The Broadcast section publishes `ITP-<platform>-<type>` services of type `http`, `ssh` and `itptest`.
+Publishing is done by the example-only native module in `example/modules/broadcaster`.
+It uses `NSNetService` on iOS and `NsdManager` on Android.
 
 Install the app on two devices on the same Wi-Fi.
 Broadcast on one device and search on the other.
@@ -91,5 +31,7 @@ Services from a laptop work as well:
 dns-sd -R "svc-a" _http._tcp local 8080 k=v
 ```
 
-iOS allows only the types listed under `NSBonjourServices` in `Info.plist`.
-The broadcaster registers a service without a socket, so the port only advertises a number.
+## Constraints
+
+- iOS only finds the types listed under `NSBonjourServices` in `example/ios/ServiceDiscoveryExample/Info.plist`.
+- The broadcaster registers a service without a socket, so the port only advertises a number.
