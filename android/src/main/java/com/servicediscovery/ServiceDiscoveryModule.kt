@@ -170,7 +170,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
           override fun onServiceFound(service: NsdServiceInfo) {
             try {
               // Service discovery success
-              if (service.serviceType == serviceType) {
+              if (isOfType(service, serviceType)) {
                 // Queue the service for resolution instead of resolving immediately
                 queueServiceForResolve(service)
               }
