@@ -1,5 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": [
+    "ANDROID_HOME",
+    "ANDROID_SDK_ROOT",
+    "JAVA_HOME",
+    "DEVELOPER_DIR",
+    "LANG",
+    "LC_ALL",
+    "NO_FLIPPER"
+  ],
   "tasks": {
     "build:android": {
       "inputs": [
