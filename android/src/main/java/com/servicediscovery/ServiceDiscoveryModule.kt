@@ -17,6 +17,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.nio.charset.StandardCharsets
 import java.util.LinkedList
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class ServiceDiscoveryModule internal constructor(context: ReactApplicationContext) :
@@ -36,6 +38,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
   private val resolveQueue: LinkedList<ResolveRequest> = LinkedList()
   private var isResolving: Boolean = false
   private val mainHandler = Handler(Looper.getMainLooper())
+  private val eventExecutor: ExecutorService = Executors.newSingleThreadExecutor()
   private val pendingServices: MutableSet<String> = HashSet()
 
   companion object {
@@ -54,6 +57,18 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
     reactApplicationContext
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       .emit(eventName, params)
+  }
+
+  // Converting a service can block on a reverse DNS lookup for the host name,
+  // so it runs on a single worker that also keeps events in order.
+  private fun sendServiceEvent(eventName: String, serviceInfo: NsdServiceInfo) {
+    eventExecutor.execute {
+      try {
+        sendEvent(eventName, serviceToMap(serviceInfo))
+      } catch (e: Exception) {
+        Log.e(NAME, "Error sending $eventName", e)
+      }
+    }
   }
 
   @ReactMethod
@@ -103,7 +118,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
             }
             if (discoveryListeners.containsKey(normalizeType(serviceInfo.serviceType))) {
               resolvedServices[serviceKey] = serviceInfo
-              sendEvent(SERVICE_FOUND, serviceToMap(serviceInfo))
+              sendServiceEvent(SERVICE_FOUND, serviceInfo)
               Log.d(NAME, "Resolved service: ${serviceInfo.serviceName}")
             }
           } catch (e: Exception) {
@@ -187,10 +202,10 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
               // Service lost
               val service = resolvedServices.remove(serviceKey(serviceInfo))
               if (service != null) {
-                sendEvent(SERVICE_LOST, serviceToMap(service))
+                sendServiceEvent(SERVICE_LOST, service)
               } else {
                 // Send unresolved service in case it was lost before it was resolved
-                sendEvent(SERVICE_LOST, serviceToMap(serviceInfo))
+                sendServiceEvent(SERVICE_LOST, serviceInfo)
               }
             } catch (e: Exception) {
               Log.e(NAME, "Error handling service lost", e)
