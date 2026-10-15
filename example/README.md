@@ -77,3 +77,19 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+## Testing discovery
+
+The app can search for and broadcast services.
+The Broadcast section publishes `ITP-<platform>-<type>` services of type `http`, `ssh` and `itptest` through the example-only `broadcaster` module.
+
+Install the app on two devices on the same Wi-Fi.
+Broadcast on one device and search on the other.
+Services from a laptop work as well:
+
+```sh
+dns-sd -R "svc-a" _http._tcp local 8080 k=v
+```
+
+iOS allows only the types listed under `NSBonjourServices` in `Info.plist`.
+The broadcaster registers a service without a socket, so the port only advertises a number.

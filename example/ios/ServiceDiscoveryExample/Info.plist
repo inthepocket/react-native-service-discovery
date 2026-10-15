@@ -53,6 +53,8 @@
 		<string>_daikin._tcp</string>
 		<string>_http._tcp</string>
 		<string>_https._tcp</string>
+		<string>_ssh._tcp</string>
+		<string>_itptest._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>We need access to the local network to be able to connect a device to your network.</string>
