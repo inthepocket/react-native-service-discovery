@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Platform,
@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   View,
   Text,
-  ScrollView,
+  FlatList,
   Button,
 } from 'react-native';
 import {
@@ -16,11 +16,13 @@ import {
   stopSearch,
 } from '@inthepocket/react-native-service-discovery';
 import { Broadcaster } from './broadcaster';
+import { LogItem, type LogEntry } from './LogItem';
 import { ToggleChip } from './ToggleChip';
 
 export default function App() {
-  const [log, setLog] = useState('');
-  const logRef = useRef<ScrollView>(null);
+  const [log, setLog] = useState<LogEntry[]>([]);
+  const logRef = useRef<FlatList<LogEntry>>(null);
+  const nextLogId = useRef(0);
   const [services, setServices] = useState([
     { name: 'ssh', enabled: false },
     { name: 'http', enabled: false },
@@ -34,22 +36,35 @@ export default function App() {
     { name: 'itptest', port: 9000, enabled: false },
   ]);
 
+  const addLog = useCallback(
+    (entry: Omit<LogEntry, 'id'>) =>
+      setLog((prev) => [...prev, { ...entry, id: nextLogId.current++ }]),
+    []
+  );
+
   useEffect(() => {
-    const found = addEventListener('serviceFound', (event) => {
-      setLog((prev) => `${prev}[serviceFound] ${JSON.stringify(event)}\n`);
-    });
-    const lost = addEventListener('serviceLost', (event) => {
-      setLog((prev) => `${prev}[serviceLost] ${JSON.stringify(event)}\n`);
-    });
+    const found = addEventListener('serviceFound', (service) =>
+      addLog({
+        kind: 'found',
+        title: `${service.name} ${service.type}`,
+        details: service,
+      })
+    );
+    const lost = addEventListener('serviceLost', (service) =>
+      addLog({
+        kind: 'lost',
+        title: `${service.name} ${service.type}`,
+        details: service,
+      })
+    );
     return () => {
       found.remove();
       lost.remove();
       Broadcaster.unregisterAll();
     };
-  }, []);
+  }, [addLog]);
 
-  const appLog = (message: string) =>
-    setLog((prev) => `${prev}[app] ${message}\n`);
+  const appLog = (message: string) => addLog({ kind: 'app', title: message });
 
   const toggleBroadcast = async (name: string, value: boolean) => {
     const broadcast = broadcasts.find((b) => b.name === name);
@@ -125,16 +140,17 @@ export default function App() {
         </View>
         <View style={styles.logsHeader}>
           <Text style={styles.title}>Logs</Text>
-          <Button title="Clear logs" onPress={() => setLog('')} />
+          <Button title="Clear logs" onPress={() => setLog([])} />
         </View>
       </View>
-      <ScrollView
+      <FlatList
         ref={logRef}
+        data={log}
+        keyExtractor={(entry) => String(entry.id)}
+        renderItem={({ item }) => <LogItem {...item} />}
         style={styles.logs}
         onContentSizeChange={() => logRef.current?.scrollToEnd()}
-      >
-        <Text style={styles.logText}>{log}</Text>
-      </ScrollView>
+      />
     </SafeAreaView>
   );
 }
@@ -170,11 +186,6 @@ const styles = StyleSheet.create({
   },
   logs: {
     flex: 1,
-    padding: 8,
     backgroundColor: '#FFF',
-  },
-  logText: {
-    fontSize: 11,
-    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
   },
 });
