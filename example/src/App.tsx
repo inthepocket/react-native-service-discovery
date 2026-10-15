@@ -98,6 +98,9 @@ export default function App() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={styles.title}>Services</Text>
+      <Text style={styles.subtitle}>
+        Listen for services of a type on the network.
+      </Text>
       <View style={styles.section}>
         {services.map(({ name, enabled }) => (
           <ListItem
@@ -109,6 +112,9 @@ export default function App() {
         ))}
       </View>
       <Text style={styles.title}>Broadcast</Text>
+      <Text style={styles.subtitle}>
+        Publish a service of this app for other devices to find.
+      </Text>
       <View style={styles.section}>
         {broadcasts.map(({ name, enabled }) => (
           <ListItem
@@ -142,6 +148,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 28,
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  subtitle: {
+    marginHorizontal: 28,
+    marginTop: 4,
+    fontSize: 13,
+    color: '#6C6C70',
   },
   section: {
     margin: 16,
