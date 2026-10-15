@@ -16,24 +16,30 @@ import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.nio.charset.StandardCharsets
 import java.util.LinkedList
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 
 
 class ServiceDiscoveryModule internal constructor(context: ReactApplicationContext) :
   ServiceDiscoverySpec(context) {
 
-  private val discoveryListeners: MutableMap<String, NsdManager.DiscoveryListener> = HashMap()
+  // NsdManager callbacks run on its own thread, React methods on the native modules thread.
+  private val discoveryListeners: MutableMap<String, NsdManager.DiscoveryListener> = ConcurrentHashMap()
   private val nsdManager: NsdManager =
     reactApplicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
 
   // Keep track of resolved services, because onServiceLost doesn't pass a resolved service.
   // Keyed by serviceKey() so identical names of different types don't collide.
-  private val resolvedServices: MutableMap<String, NsdServiceInfo> = HashMap()
+  private val resolvedServices: MutableMap<String, NsdServiceInfo> = ConcurrentHashMap()
 
   // Resolve queue to handle Android's single-resolve limitation
   private data class ResolveRequest(val service: NsdServiceInfo, var retryCount: Int = 0)
   private val resolveQueue: LinkedList<ResolveRequest> = LinkedList()
   private var isResolving: Boolean = false
   private val mainHandler = Handler(Looper.getMainLooper())
+  private val eventExecutor: ExecutorService = Executors.newSingleThreadExecutor()
   private val pendingServices: MutableSet<String> = HashSet()
 
   companion object {
@@ -54,12 +60,41 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
       .emit(eventName, params)
   }
 
+  // Converting a service can block on a reverse DNS lookup for the host name,
+  // so it runs on a single worker that also keeps events in order.
+  private fun sendServiceEvent(eventName: String, serviceInfo: NsdServiceInfo) {
+    try {
+      eventExecutor.execute {
+        try {
+          sendEvent(eventName, serviceToMap(serviceInfo))
+        } catch (e: Exception) {
+          Log.e(NAME, "Error sending $eventName", e)
+        }
+      }
+    } catch (e: RejectedExecutionException) {
+      // Module was invalidated
+    }
+  }
+
   @ReactMethod
   override fun addListener(eventName: String) {
   }
 
   @ReactMethod
   override fun removeListeners(count: Double) {
+  }
+
+  override fun invalidate() {
+    super.invalidate()
+    discoveryListeners.values.forEach { tryStopServiceDiscovery(it) }
+    discoveryListeners.clear()
+    resolvedServices.clear()
+    synchronized(resolveQueue) {
+      resolveQueue.clear()
+      pendingServices.clear()
+    }
+    mainHandler.removeCallbacksAndMessages(null)
+    eventExecutor.shutdownNow()
   }
 
   private fun queueServiceForResolve(service: NsdServiceInfo) {
@@ -101,7 +136,7 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
             }
             if (discoveryListeners.containsKey(normalizeType(serviceInfo.serviceType))) {
               resolvedServices[serviceKey] = serviceInfo
-              sendEvent(SERVICE_FOUND, serviceToMap(serviceInfo))
+              sendServiceEvent(SERVICE_FOUND, serviceInfo)
               Log.d(NAME, "Resolved service: ${serviceInfo.serviceName}")
             }
           } catch (e: Exception) {
@@ -185,10 +220,10 @@ class ServiceDiscoveryModule internal constructor(context: ReactApplicationConte
               // Service lost
               val service = resolvedServices.remove(serviceKey(serviceInfo))
               if (service != null) {
-                sendEvent(SERVICE_LOST, serviceToMap(service))
+                sendServiceEvent(SERVICE_LOST, service)
               } else {
                 // Send unresolved service in case it was lost before it was resolved
-                sendEvent(SERVICE_LOST, serviceToMap(serviceInfo))
+                sendServiceEvent(SERVICE_LOST, serviceInfo)
               }
             } catch (e: Exception) {
               Log.e(NAME, "Error handling service lost", e)
