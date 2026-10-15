@@ -211,6 +211,17 @@ RCT_EXPORT_METHOD(stopSearch:(NSString *)type
         // Send a serviceFound event to React Native
         [self sendServiceEventWithName:@"serviceFound" service:cachedService];
     }
+
+    // Resolving without a timeout never ends by itself and can report the
+    // same service again, so stop once the addresses are known.
+    [service stop];
+}
+
+// Called when a service could not be resolved
+- (void)netService:(NSNetService *)service didNotResolve:(NSDictionary<NSString *, NSNumber *> *)errorDict
+{
+    NSLog(@"[ServiceDiscovery] Could not resolve %@ (error code %@)", service.name, errorDict[NSNetServicesErrorCode]);
+    [service stop];
 }
 
 #pragma mark - Helpers
