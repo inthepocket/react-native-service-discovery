@@ -19,7 +19,7 @@ Add the services you want to search for in `Info.plist`:
 <key>NSBonjourServices</key>
 <array>
   <!-- Change to your services -->
-  <string>_ssh._tcp</string> 
+  <string>_ssh._tcp</string>
   <string>_http._tcp</string>
 </array>
 ```
@@ -55,7 +55,7 @@ lostListener.remove();
 
 ### startSearch
 
-Start searching for services of a specific type. Searching for multiple services can be done in parallel.
+Start searching for services of a specific type. Searching for multiple services can be done in parallel. Starting a search for a type that is already being searched does nothing. Only `_tcp` services are supported.
 
 | Parameter | Type   | Description |
 | --------- | ------ | ----------- |
@@ -94,7 +94,7 @@ An `EmitterSubscription` that can be used to remove the listener, by calling `re
 | --------- | ------ | ----------- |
 | name      | `string` | Service name. |
 | type      | `string` | Service type, e.g. `_http._tcp.`. |
-| domain    | `string` | Domain, can be `local.` or any other domain. |
+| domain    | `string` | Domain, can be `local.` or any other domain. On Android this is always `local.`. |
 | hostName  | `string` | The domain name of the IP advertising the service. On local networks this is usually the host name. |
 | addresses | `string[]` | The IP addresses of the service. This is an array of IPv4 and IPv6 addresses. |
 | port      | `number` | The port number where the service can be reached. |
@@ -109,9 +109,9 @@ You can listen for multiple service types with the same listener:
 import * as ServiceDiscovery from '@inthepocket/react-native-service-discovery';
 
 ServiceDiscovery.addEventListener('serviceFound', (service) => {
-  if(service.type === '_http._tcp.') {
+  if (service.type === '_http._tcp.') {
     console.log('HTTP service found:', service);
-  } else if(service.type === '_ssh._tcp.') {
+  } else if (service.type === '_ssh._tcp.') {
     console.log('SSH service found:', service);
   }
 });
@@ -119,6 +119,10 @@ ServiceDiscovery.addEventListener('serviceFound', (service) => {
 await ServiceDiscovery.startSearch('http');
 await ServiceDiscovery.startSearch('ssh');
 ```
+
+## Example app
+
+The [example app](example/README.md) can broadcast mDNS services from a device, which lets you test discovery without extra hardware.
 
 ## Contributing
 
